@@ -1,5 +1,8 @@
 window.createAnimationBoard = function (svgElem, height, width) {
 
+	svgElem.setAttribute("width", width + "px");
+	svgElem.setAttribute("height", height + "px");
+	
 	function makeSVG(tag, attrs) {
 		var el = document.createElementNS('http://www.w3.org/2000/svg', tag);
 		for (var k in attrs)
@@ -35,12 +38,11 @@ window.createAnimationBoard = function (svgElem, height, width) {
 		},
 		resize: function (height, width) {
 			simulation.resize(height, width);
-			svg.setAttribute("width", width + "px");
-			svg.setAttribute("height", height + "px");
+			svgElem.setAttribute("width", width + "px");
+			svgElem.setAttribute("height", height + "px");
 		}
-
-	} 
-};
+	}; 
+}
 
 
 
