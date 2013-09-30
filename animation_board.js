@@ -16,19 +16,19 @@ window.createAnimationBoard = function (svgElem, height, width) {
 	return {
 		redraw: function (timestamp) {
 			simulation.update(timestamp);
-			simulation.eachParticle(function (id, state) {
+			simulation.eachParticle(function (id, particle) {
 				var circle = particleElems[id];
-				circle.setAttribute("cx", state.x);
-				circle.setAttribute("cy", state.y);
+				circle.setAttribute("cx", particle.x);
+				circle.setAttribute("cy", particle.y);
 			});
 		},
-		createParticle: function(state) {
+		createParticle: function(state, timestamp) {
 			var circle = makeSVG('circle', { 
 				cx: state.x, cy: state.y, r: state.r, 
-				stroke: "black", "stroke-width": 1, fill: "red"
+				stroke: "black", "stroke-width": 1, fill: state.color
 			});
 			svgElem.insertBefore(circle);
-			var id = simulation.createParticle(state);
+			var id = simulation.createParticle(state, timestamp);
 			circle.setAttribute("data-particle-id", id);
 			particleElems[id] = circle;
 		},

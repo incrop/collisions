@@ -3,13 +3,13 @@ createEventQueue = function () {
 
 	return {
 		insert: function (event) {
-			if (!head || head.timestamp > timestamp) {
+			if (!head || head.timestamp > event.timestamp) {
 				event.next = head; 
 				head = event;
 			} else {
 				var curr = head;
 				while (true) {
-					if (!curr.next || curr.next.timestamp > timestamp) {
+					if (!curr.next || curr.next.timestamp > event.timestamp) {
 						event.next = curr.next;
 						curr.next = event;
 						break;
