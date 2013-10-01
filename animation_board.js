@@ -1,7 +1,4 @@
 window.createAnimationBoard = function (svgElem, height, width) {
-
-	svgElem.setAttribute("width", width + "px");
-	svgElem.setAttribute("height", height + "px");
 	
 	function makeSVG(tag, attrs) {
 		var el = document.createElementNS('http://www.w3.org/2000/svg', tag);
@@ -32,15 +29,11 @@ window.createAnimationBoard = function (svgElem, height, width) {
 			circle.setAttribute("data-particle-id", id);
 			particleElems[id] = circle;
 		},
-		deleteParticle: function (id) {
-			simulation.deleteParticle(id);
+		deleteParticle: function (id, timestamp) {
+			simulation.deleteParticle(id, timestamp);
 			svgElem.removeChild(particleElems[id]);
 		},
-		resize: function (height, width) {
-			simulation.resize(height, width);
-			svgElem.setAttribute("width", width + "px");
-			svgElem.setAttribute("height", height + "px");
-		}
+		resize: simulation.resize
 	}; 
 }
 

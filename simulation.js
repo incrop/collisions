@@ -115,11 +115,16 @@ window.createSimulation = function (initHeight, initWidth) {
 
 	function createParticle(that) {
 		that.move = function (timestamp) {
-			var progress = 
-				(timestamp - that.startEvt.timestamp) / 
-				(that.endEvt.timestamp - that.startEvt.timestamp); 
-			that.x = that.startEvt.x + (that.endEvt.x - that.startEvt.x) * progress;
-			that.y = that.startEvt.y + (that.endEvt.y - that.startEvt.y) * progress;
+            if (that.startEvt.timestamp === that.endEvt.timestamp) {
+                that.x = that.endEvt.x; 
+                that.y = that.endEvt.y; 
+            } else {
+				var progress = 
+					(timestamp - that.startEvt.timestamp) / 
+					(that.endEvt.timestamp - that.startEvt.timestamp); 
+				that.x = that.startEvt.x + (that.endEvt.x - that.startEvt.x) * progress;
+				that.y = that.startEvt.y + (that.endEvt.y - that.startEvt.y) * progress;            	
+            }
 		}
 		that.addEndEvt = function (dt) {
 			var start = that.startEvt;
@@ -136,16 +141,21 @@ window.createSimulation = function (initHeight, initWidth) {
 	return {
 		createParticle: function (state, timestamp) {
 			var particle = createParticle(state);
-			var collision = predictNextCollision(particle, timestamp);
-			events.insert(collision);
-			//change other events
+			events.insert(predictNextCollision(particle, timestamp));
 			var id = nextParticleId++;
 			particles[id] = particle;
 			return id;
 		},
-		/*deleteParticle: function (state) {
+		deleteParticle: function (id, timestamp) {
+			var particle = particles[id];
 			delete particles[id];
-		},*/
+			particle.collision.active = false;
+			for (var i = 0; i < particle.collision.particles.length; i++) {
+				var another = particle.collision.particles[i];
+				if (another !== particle)
+					events.insert(predictNextCollision(another, timestamp));
+			}
+		},
 		update: function (timestamp) {
 			var event = events.popIfHappened(timestamp);
 			while (event) {
@@ -154,13 +164,22 @@ window.createSimulation = function (initHeight, initWidth) {
 					event.effect();
 					for (var i = 0; i < event.particles.length; i++) {
 						var particle = event.particles[i];
-						var collision = predictNextCollision(particle, timestamp);
-						events.insert(collision);
+						events.insert(predictNextCollision(particle, timestamp));
 					}
 				}
 				event = events.popIfHappened(timestamp);
 			}
 			moveParticles(timestamp);
+		},
+		resize: function (newHeight, newWidth, timestamp) {
+			height = newHeight;
+			width = newWidth;
+			for (var id in particles) {
+				if (particles.hasOwnProperty(id)) {
+					particles[id].collision.active = false;
+					events.insert(predictNextCollision(particles[id], timestamp));
+				}
+			}
 		},
 		eachParticle: function (func) {
 			for (var id in particles) {
