@@ -20,8 +20,6 @@ $(document).ready(function () {
 			board.redraw(timestamp);
 			requestAnimationFrame(redrawBoard);
 		}
-		board.createParticle({ x: 50, y: 70, r: 10, vx: 0.1, vy: 0.05, color: "green" }, timestamp);
-		board.createParticle({ x: 140, y: 20, r: 15, vx: 0.12, vy: -0.15, color: "yellow" }, timestamp);
 
 		$win.resize(function() {
 			resize = true;
@@ -29,7 +27,7 @@ $(document).ready(function () {
 		$svg.on("mousedown", "circle", function() {
 			deleteParticles.push($(this).data("particle-id"));
 		});
-		var colors = ["white", "silver", "gray", "red", "maroon", "yellow", 
+		var colors = ["silver", "gray", "red", "maroon", "yellow", 
 			"olive", "lime", "green", "aqua", "teal", "blue", "navy", "fuchsia", "purple"];
 		function randomBetween(a, b) {
 			return a + Math.random() * (b - a);

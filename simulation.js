@@ -1,5 +1,5 @@
 window.createSimulation = function (initHeight, initWidth) {
-
+	var maxV = 0.5;
 	var height = initHeight;
 	var width = initWidth;
 
@@ -76,6 +76,15 @@ window.createSimulation = function (initHeight, initWidth) {
 			particle.vy += Jy / particle.m;
 			another.vx -= Jx / another.m;
 			another.vy -= Jy / another.m;
+			var v = Math.max(Math.abs(particle.vx), Math.abs(particle.vy), 
+				Math.abs(another.vx), Math.abs(another.vy));
+			if (v > maxV) {
+				var coeff = maxV/v;
+				particle.vx *= coeff;
+				particle.vy *= coeff;
+				another.vx *= coeff;
+				another.vy *= coeff;
+			}
 		}
 		var min = Math.min(hrz, vrt, prt)
 		if (min === hrz) {
@@ -100,22 +109,25 @@ window.createSimulation = function (initHeight, initWidth) {
 			return collision;
 		} else {
 			particle.addEndEvt(prt);
-			another.addEndEvt(prt);
-			another.collision.active = false;
 			var collision = {
 				active: true, 
 				timestamp: particle.startEvt.timestamp + prt, 
 				effect: bounceOffParticle, 
 				particles: [particle, another] 
 			};
-			particle.collision = another.collision = collision;	
+			particle.collision = collision;
+			if (collision.timestamp < another.collision.timestamp) {
+				another.addEndEvt(prt);
+				another.collision.active = false;
+				another.collision = collision
+			}	
 			return collision;		
 		}
 	}
 
 	function createParticle(that) {
 		that.move = function (timestamp) {
-            if (that.startEvt.timestamp === that.endEvt.timestamp) {
+            if (Math.abs(that.startEvt.timestamp - that.endEvt.timestamp) < 10) {
                 that.x = that.endEvt.x; 
                 that.y = that.endEvt.y; 
             } else {
